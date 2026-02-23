@@ -10,6 +10,8 @@ import {
     User,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import AuthImagePattern from "../components/AuthImagePattern.jsx";
+import toast from "react-hot-toast";
 
 const SignUpPage = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -18,11 +20,30 @@ const SignUpPage = () => {
         email: "",
         password: "",
     });
-    const validateForm = () => {};
+    const { signup, isSigningUp } = useAuthStore();
+
+    const validateForm = () => {
+        if (!formData.fullName.trim())
+            return toast.error("Fullname is required");
+        if (!formData.email.trim()) return toast.error("Email is required");
+        if (!/\S+@\S+\.\S+/.test(formData.email))
+            return toast.error("Invalid email format");
+
+        if (!formData.password.trim())
+            return toast.error("Password is required");
+        if (formData.password.length < 6)
+            return toast.error("Password must be at least 6 characters");
+
+        return true;
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
+        const sucess = validateForm();
+        if (sucess) {
+            signup(formData);
+        }
     };
-    const { signup, isSigningUp } = useAuthStore();
     return (
         <div className="min-h-screen grid lg:grid-cols-2">
             {/* left side */}
@@ -33,7 +54,7 @@ const SignUpPage = () => {
                         <div className="flex flex-col items-center gap-2 group">
                             <div
                                 className="size-12 rounded-xl bg-primary/10 flex items-center justify-center 
-              group-hover:bg-primary/20 transition-colors"
+                                group-hover:bg-primary/20 transition-colors"
                             >
                                 <MessageSquare className="size-6 text-primary" />
                             </div>
@@ -153,14 +174,21 @@ const SignUpPage = () => {
 
                     <div className="text-center">
                         <p className="text-base-content/60">
-                            Already have an account?{" "}
+                            Already have an account ?{" "}
                             <Link to="/login" className="link link-primary">
-                                Sign in
+                                <button className="btn btn-outline btn-primary rounded-2xl">
+                                    Sign in
+                                </button>
                             </Link>
                         </p>
                     </div>
                 </div>
             </div>
+            {/* right side */}
+            <AuthImagePattern
+                title="Join our community"
+                subtitle="Connect with friends, hsare moments and stay in touch with your loved ones!"
+            />
         </div>
     );
 };

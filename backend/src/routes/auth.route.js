@@ -13,6 +13,11 @@ router.post("/login", login);
 router.get("/logout", logout);
 
 router.put("/update-profile", protectRoute, updateProfile);
-router.get("/check", protectRoute, checkAuth);
+
+// /check should be usable by anonymous clients; it simply returns the
+// current user if a valid cookie is present, otherwise null.  Avoid
+// applying protectRoute so we don't trigger a 401 every time the
+// frontend checks auth on page load.
+router.get("/check", checkAuth);
 
 export default router;
