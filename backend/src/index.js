@@ -5,8 +5,9 @@ import cookieParser from "cookie-parser";
 import { connectDB } from "./lib/db.js";
 import cors from "cors";
 import messageRoutes from "./routes/message.route.js";
+import { app, server } from "./lib/socket.js";
+import path from "path";
 dotenv.config();
-const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(
@@ -18,8 +19,15 @@ app.use(
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.resolve(__dirname, "../frontend/dist")));
+    app.get("*", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
+    });
+}
+
 const PORT = process.env.PORT;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server running on ${PORT}`);
     connectDB();
 });
